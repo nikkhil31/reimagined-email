@@ -1,23 +1,25 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState } from "react";
+import { Route, Routes } from "react-router-dom";
+import Compose from "./Compose";
+import Detail from "./Detail";
+import List from "./List";
+import Nav from "./Nav";
 
 function App() {
+  const [compose, setCompose] = useState(false);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="min-h-screen bg-gray-200 flex">
+      <Nav />
+      {/* Main */}
+      {/* <List /> */}
+      {/* Details */}
+      <Routes>
+        <Route path="/" element={<List />} />
+        <Route path="/details" element={<Detail setCompose={setCompose} />} />
+      </Routes>
+
+      {compose && <Compose setCompose={setCompose} />}
     </div>
   );
 }
