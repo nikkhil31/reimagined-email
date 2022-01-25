@@ -10,6 +10,7 @@ import { Link, useParams } from "react-router-dom";
 import { useEffect } from "react/cjs/react.development";
 import { useAppcontext } from "../context/AppProvider";
 import { db } from "../firebase/config";
+import Nav from "./Nav";
 
 const Detail = () => {
 
@@ -36,6 +37,8 @@ const Detail = () => {
   }, [id]);
 
   return (
+    <div className="min-h-screen bg-gray-200 flex">
+      <Nav />
     <main className="my-6 w-full pl-[17%] pr-10">
       <div className="h-12 flex bg-white shadow rounded-2xl items-center justify-between px-4">
         <Link to="/">
@@ -105,6 +108,7 @@ const Detail = () => {
         </button>
       </div>
     </main>
+    </div>
   );
 };
 

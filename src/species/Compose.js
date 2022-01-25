@@ -7,10 +7,9 @@ import {
 } from "react-icons/fa";
 import classNames from "classnames/bind";
 import { db } from "../firebase/config";
-import { addDoc, collection, doc, getDoc, getDocs, query, setDoc, Timestamp, updateDoc, where } from "firebase/firestore";
+import { addDoc, collection, doc,  getDocs, query, Timestamp, updateDoc, where } from "firebase/firestore";
 import { useAppcontext } from "../context/AppProvider";
 import { isComposeValid } from "../helper/validation";
-import { useParams } from "react-router-dom";
 
 const Compose = () => {
   const [expand, setExpand] = useState(false);
@@ -24,9 +23,9 @@ const Compose = () => {
 
   useEffect(() => {
 
-    compose === 2 && setForm({ ...form, to: messages[0].from.did, subject: `Re: ${subject}` })
+    compose === 2 && setForm({ ...form, to: messages[0].from.did, subject: subject })
 
-    compose === 3 && setForm({ ...form, message: messages.map(m => m.message).join('\n \n'), subject: `FWD: ${subject}` })
+    compose === 3 && setForm({ ...form, message: messages.map(m => m.message).join('\n \n'), subject: subject })
 
   }, [compose]);
 
@@ -38,18 +37,18 @@ const Compose = () => {
 
     // return console.log(id);
 
-    let to = {}
-    const docRef = query(collection(db, "users"), where("email_id", "==", form.to));
-    const getToMail = await getDocs(docRef);
+        let to = {}
+        const docRef = query(collection(db, "users"), where("email_id", "==", form.to));
+        const getToMail = await getDocs(docRef);
 
-    getToMail.forEach((doc) => {
-      // doc.data() is never undefined for query doc snapshots
-      to = { ...doc.data(), id: doc.id, }
-    });
+        getToMail.forEach((doc) => {
+          // doc.data() is never undefined for query doc snapshots
+          to = { ...doc.data(), id: doc.id, }
+        });
 
-    if (JSON.stringify(to) === '{}') {
-      return setError({ ...error, to: 'Email address not found!' })
-    }
+        if (JSON.stringify(to) === '{}') {
+          return setError({ ...error, to: 'Email address not found!' })
+        }
 
 
     // return to ? console.log(to) : console.log('notfound');
@@ -82,7 +81,7 @@ const Compose = () => {
       const docRef = doc(db, "email", id);
 
       await updateDoc(docRef, {
-        subject: form.subject,
+        flow:0,
         createdAt: time
       });
 

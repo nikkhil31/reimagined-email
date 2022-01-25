@@ -13,6 +13,7 @@ import {
 import { Link } from "react-router-dom";
 import { db } from "../firebase/config";
 import { useAppcontext } from "../context/AppProvider";
+import Nav from "./Nav";
 
 const List = () => {
 
@@ -39,6 +40,8 @@ const List = () => {
 
 
   return (
+    <div className="min-h-screen bg-gray-200 flex">
+      <Nav />
     <main className="my-6 w-full pl-[17%] pr-10">
       {/* Header */}
       <div className="flex space-x-3">
@@ -117,6 +120,7 @@ const List = () => {
 
       </div>
     </main>
+    </div>
   );
 };
 
