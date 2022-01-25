@@ -3,7 +3,7 @@ import { FaInbox, FaRegBell, FaRegPaperPlane, FaRegStar } from "react-icons/fa";
 
 const Nav = () => {
   return (
-    <nav className="bg-sky-500 h-full w-1/6 rounded-r-3xl flex flex-col fixed">
+    <nav className="bg-sky-500 h-full w-[15%] rounded-r-3xl flex flex-col fixed">
       <h2 className="text-white font-bold text-2xl text-center pt-3 w-full">
         Logo
       </h2>

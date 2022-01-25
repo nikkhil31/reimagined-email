@@ -1,25 +1,27 @@
 import { useState } from "react";
 import { Route, Routes } from "react-router-dom";
-import Compose from "./Compose";
-import Detail from "./Detail";
-import List from "./List";
-import Nav from "./Nav";
+import { useAppcontext } from "./context/AppProvider";
+import Compose from "./species/Compose";
+import Detail from "./species/Detail";
+import List from "./species/List";
+import Nav from "./species/Nav";
 
 function App() {
-  const [compose, setCompose] = useState(false);
+  // const [compose, setCompose] = useState(true);
+
+  const { state: { compose } } = useAppcontext()
 
   return (
     <div className="min-h-screen bg-gray-200 flex">
       <Nav />
       {/* Main */}
-      {/* <List /> */}
       {/* Details */}
       <Routes>
         <Route path="/" element={<List />} />
-        <Route path="/details" element={<Detail setCompose={setCompose} />} />
+        <Route path="/details/:id" element={<Detail />} />
       </Routes>
 
-      {compose && <Compose setCompose={setCompose} />}
+      {compose ? <Compose /> : ''}
     </div>
   );
 }
