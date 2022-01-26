@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
+import { useAppcontext } from "../context/AppProvider";
 import { checkEmailExists } from "../helper/check";
 import { useAuth } from "../hook/useAuth";
 
@@ -14,27 +15,32 @@ const Login = ({ type }) => {
 
   const [error, setError] = useState("");
 
-  const { signIn,error:authError } = useAuth();
+  const { signIn, login, error: authError, response } = useAuth();
+  const { dispatch } = useAppcontext()
 
   let navigate = useNavigate();
 
   const onSubmit = async (data) => {
+
+
     if (type === 1) {
       const isExist = await checkEmailExists(data.email);
-      console.log(isExist);
       if (isExist.status) return setError(isExist.message);
       setError("");
 
-      signIn(data)
-
-      if(authError?.code) {
-        return console.log(authError?.message);
-      } 
+      await signIn(data)
     }
 
-    return !error.code && navigate('/',{ replace: true })
-
+    if (type === 0) {
+      await login(data)
+    }
   };
+
+  if (response) {
+    dispatch({ type: 'LOGIN', payload: response })
+    navigate('/', { replace: true })
+  }
+
 
   return (
     <div className="flex flex-col items-center justify-center w-screen h-screen bg-gray-200 text-gray-700">
@@ -42,9 +48,9 @@ const Login = ({ type }) => {
         onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col bg-white rounded shadow-lg p-12 mt-12"
       >
-      {error?.message && (<div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-red-200 dark:text-red-800" role="alert">
-        <span class="font-medium">Error</span> {error.message}
-      </div>)}
+        {authError && (<div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-red-200 dark:text-red-800" role="alert">
+          <span class="font-medium">Error</span> {authError.message}
+        </div>)}
         {type === 1 ? (
           <div className="mb-2">
             <label className="font-semibold text-xs" htmlFor="usernameField">

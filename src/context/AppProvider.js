@@ -1,6 +1,7 @@
 import { onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc } from "firebase/firestore";
 import { createContext, useContext, useEffect, useReducer } from "react";
-import { auth } from "../firebase/config";
+import { auth, db } from "../firebase/config";
 
 const AppContext = createContext();
 
@@ -38,11 +39,17 @@ export const AppContextProvider = ({ children }) => {
     authIsReady: false,
   });
 
-  onAuthStateChanged(auth, (user) => {});
-
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (user) => {
-      dispatch({ type: "AUTH_IS_READY", payload:  user});
+    const unsub = onAuthStateChanged(auth, async (user) => {
+      let usr = {}
+      if (user) {
+        const docRef = doc(db, "users", user.uid);
+        const docSnap = await getDoc(docRef);
+
+        usr = docSnap.data()
+        console.log('context', usr)
+      }
+      dispatch({ type: "AUTH_IS_READY", payload: usr });
     });
 
     return unsub;
