@@ -2,6 +2,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { createContext, useContext, useEffect, useReducer } from "react";
 import { auth, db } from "../firebase/config";
+import { isEmpty } from "../helper/check";
 
 const AppContext = createContext();
 
@@ -42,13 +43,15 @@ export const AppContextProvider = ({ children }) => {
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
       let usr = {}
-      if (user) {
+      // console.log('abc', user.uid);
+      if (!isEmpty(user)) {
         const docRef = doc(db, "users", user.uid);
         const docSnap = await getDoc(docRef);
 
-        usr = docSnap.data()
-        console.log('context', usr)
+        usr = { ...docSnap.data(), id: docSnap.id }
+        // console.log('context', usr)
       }
+      console.log(usr);
       dispatch({ type: "AUTH_IS_READY", payload: usr });
     });
 

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppcontext } from "../context/AppProvider";
-import { checkEmailExists } from "../helper/check";
+import { checkEmailExists, isEmpty } from "../helper/check";
 import { useAuth } from "../hook/useAuth";
 
 
@@ -36,7 +36,8 @@ const Login = ({ type }) => {
     }
   };
 
-  if (response) {
+
+  if (!isEmpty(response)) {
     dispatch({ type: 'LOGIN', payload: response })
     navigate('/', { replace: true })
   }
@@ -48,7 +49,7 @@ const Login = ({ type }) => {
         onSubmit={handleSubmit(onSubmit)}
         className="flex flex-col bg-white rounded shadow-lg p-12 mt-12"
       >
-        {authError && (<div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-red-200 dark:text-red-800" role="alert">
+        {authError && (<div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-red-200 w-64 dark:text-red-800 truncate" role="alert">
           <span class="font-medium">Error</span> {authError.message}
         </div>)}
         {type === 1 ? (

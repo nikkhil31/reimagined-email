@@ -1,18 +1,21 @@
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import { addDoc, doc, getDoc } from "firebase/firestore";
-import { useState } from "react";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { useEffect, useState } from "react";
 import { auth, db } from "../firebase/config";
+import { isEmpty } from "../helper/check";
 
 export const useAuth = () => {
   const [response, setResponse] = useState({});
   const [error, setError] = useState();
+
+  const [isCancelled, setIsCancelled] = useState(false)
 
   const signIn = async ({ name, email, password }) => {
 
     try {
       const { user } = await createUserWithEmailAndPassword(auth, email, password)
 
-      if (!user) {
+      if (isEmpty(user)) {
         throw new Error('Could not complete signup')
       }
 
@@ -21,12 +24,13 @@ export const useAuth = () => {
         name: name
       }
 
-      const refUser = doc(db, "users", user.uid);
-      const userID = await addDoc(refUser, userData);
 
-      setResponse({ ...userID.data(), id: user.uid });
+      const refUser = doc(db, "users", user.uid);
+      await setDoc(refUser, userData);
+
+      !isCancelled && setResponse({ ...userData, id: user.uid });
     } catch (error) {
-      setError(error);
+      !isCancelled && setError(error);
     }
 
 
@@ -41,12 +45,15 @@ export const useAuth = () => {
       const docRef = doc(db, "users", user.uid);
       const docUser = await getDoc(docRef);
       // console.log(docUser.data());
-      setResponse({ ...docUser.data(), id: user.uid });
+      !isCancelled && setResponse({ ...docUser.data(), id: user.uid });
     } catch (error) {
-      setError(error);
+      !isCancelled && setError(error);
     }
   }
 
+  useEffect(() => {
+    return () => setIsCancelled(true)
+  }, [])
 
   return { signIn, login, response, error };
 };
