@@ -1,5 +1,5 @@
-import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
-import React, { useState } from "react";
+import { collection, orderBy, query } from "firebase/firestore";
+import React from "react";
 import {
   FaEllipsisV,
   FaLongArrowAltLeft,
@@ -17,16 +17,15 @@ const Detail = () => {
 
   let { id } = useParams();
 
-  const { state: { details: { messages: message, subject }, list }, dispatch } = useAppcontext()
+  const { state: { details: { subject } }, dispatch } = useAppcontext()
 
   const q = query(collection(db, "email", id, 'message'), orderBy("createdAt"));
-  const { documents, error } = useRealtime(q)
+  const { documents } = useRealtime(q)
 
 
   useEffect(() => {
-    const subject = list.find(e => e.id === id).subject
-    dispatch({ type: 'DETAILS', payload: { subject, messages: documents, id } })
-  }, [documents]);
+    dispatch({ type: 'DETAILS', payload: { messages: documents } })
+  }, [documents, dispatch]);
 
   return (
     <div className="min-h-screen bg-gray-200 flex">
@@ -45,9 +44,9 @@ const Detail = () => {
         {/* main area */}
 
         {
-          message.map(m => (
+          documents.map(m => (
 
-            <div className="mt-3 bg-white rounded-2xl p-9 divide-y">
+            <div className="mt-3 bg-white rounded-2xl p-9 divide-y" key={m.id}>
               {/* Mail area */}
 
               <div className="pt-3 mb-5">

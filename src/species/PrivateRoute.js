@@ -9,6 +9,7 @@ const PrivateRoute = () => {
 
 
     if (isEmpty(user)) {
+        console.log(user);
         return <Navigate to="/login" state={{ from: location }} />
     }
 

@@ -6,10 +6,12 @@ import { BrowserRouter } from "react-router-dom";
 import { AppContextProvider } from "./context/AppProvider";
 
 ReactDOM.render(
-  <BrowserRouter>
-    <AppContextProvider>
-      <App />
-    </AppContextProvider>
-  </BrowserRouter>,
+  <React.StrictMode>
+    <BrowserRouter>
+      <AppContextProvider>
+        <App />
+      </AppContextProvider>
+    </BrowserRouter>
+  </React.StrictMode>,
   document.getElementById("root")
 );

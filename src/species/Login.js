@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
 import { useAppcontext } from "../context/AppProvider";
@@ -34,13 +34,21 @@ const Login = ({ type }) => {
     if (type === 0) {
       await login(data)
     }
+
+    if (!isEmpty(response)) {
+      dispatch({ type: 'LOGIN', payload: response })
+      navigate('/', { replace: true })
+    }
+
   };
 
+  useEffect(() => {
+    if (!isEmpty(response)) {
+      dispatch({ type: 'LOGIN', payload: response })
+      navigate('/', { replace: true })
+    }
+  }, [response]);
 
-  if (!isEmpty(response)) {
-    dispatch({ type: 'LOGIN', payload: response })
-    navigate('/', { replace: true })
-  }
 
 
   return (

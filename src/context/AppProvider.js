@@ -2,7 +2,6 @@ import { onAuthStateChanged } from "firebase/auth";
 import { doc, getDoc } from "firebase/firestore";
 import { createContext, useContext, useEffect, useReducer } from "react";
 import { auth, db } from "../firebase/config";
-import { isEmpty } from "../helper/check";
 
 const AppContext = createContext();
 
@@ -17,7 +16,7 @@ export const appReducer = (state, action) => {
     case "LIST":
       return { ...state, list: action.payload };
     case "DETAILS":
-      return { ...state, details: action.payload };
+      return { ...state, details: { ...state.details, ...action.payload } };
     case "LOGIN":
       return { ...state, user: action.payload };
     case "AUTH_IS_READY":
@@ -43,8 +42,8 @@ export const AppContextProvider = ({ children }) => {
   useEffect(() => {
     const unsub = onAuthStateChanged(auth, async (user) => {
       let usr = {}
-      // console.log('abc', user.uid);
-      if (!isEmpty(user)) {
+      console.log('abc', !user);
+      if (user) {
         const docRef = doc(db, "users", user.uid);
         const docSnap = await getDoc(docRef);
 
