@@ -24,6 +24,8 @@ function App() {
         <Route element={<PrivateRoute />}>
           <Route path="/" element={<List page={0} />} />
           <Route path="/stared" element={<List page={1} />} />
+          <Route path="/important" element={<List page={2} />} />
+          <Route path="/sent" element={<List page={3} />} />
           <Route path="/details/:id" element={<Detail />} />
         </Route>
       </Routes>) : ''}

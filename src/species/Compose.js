@@ -61,7 +61,8 @@ const Compose = () => {
         from_name: user.name,
         to: form.to.id,
         to_name: form.to.name,
-        type: [0, 1],
+        type: [],
+        convey:[user.id,form.to.id],
         message: form.message.substring(0, 120),
       })
 

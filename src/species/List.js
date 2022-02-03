@@ -18,7 +18,7 @@ import Nav from "./Nav";
 import { useRealtime } from "../hook/useRealtime";
 import { useFirestore } from "../hook/useFirestore";
 
-const List = () => {
+const List = ({page}) => {
 
 
   const [checked, setChecked] = useState([]);
@@ -27,14 +27,28 @@ const List = () => {
 
   const { state: { list, user }, dispatch } = useAppcontext()
 
-  const constraints = []
 
-
-
-  const q = query(collection(db, "email"), where("to", "==", user.id));
+  const q = query(collection(db, "email"), where("convey", "array-contains", user.id));
 
 
   const { documents, error } = useRealtime(q)
+
+
+  const pageFilter = (doc) => {
+    switch (page) {
+      case 0:
+        return doc.to === user.id 
+      case 1:
+        return doc.type.includes(0) && doc.to === user.id
+      case 2:
+        return doc.type.includes(1) && doc.to === user.id
+      case 3:
+          return doc.from === user.id 
+      default:
+        return 1 === 1
+    }
+    
+  }
 
   const goToMassage = (id, subject) => {
     dispatch({ type: 'DETAILS', payload: { id, subject } })
@@ -101,7 +115,7 @@ const List = () => {
         <div className="mt-6 space-y-2">
 
           {
-            documents && documents.map(email => (
+            documents && documents.filter(pageFilter).map(email => (
               <div
                 // to={`details/${email.id}`}
                 // onClick={() => goToMassage(email.id, email.subject)}

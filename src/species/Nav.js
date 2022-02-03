@@ -1,6 +1,6 @@
 import React from "react";
 import { FaInbox, FaRegBell, FaRegPaperPlane, FaRegStar } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { useAppcontext } from "../context/AppProvider";
 
 const Nav = () => {
@@ -21,23 +21,23 @@ const Nav = () => {
           <span className="font-semibold">Compose</span>
         </li>
 
-        <Link to='/' className="text-white inline-flex items-center px-2 py-1 bg-white/25 w-full rounded cursor-pointer">
+        <NavLink  to='/' className={({ isActive }) => `text-white inline-flex items-center px-2 py-1 hover:bg-white/25 w-full rounded cursor-pointer ${isActive ? 'bg-white/25' : ''}`}>
           <FaInbox className="w-5 h-5" />
           <span className="ml-3 font-semibold">Inbox</span>
-        </Link>
-        <Link to='/stared' className="text-white inline-flex items-center px-2 py-1 w-full rounded hover:bg-white/25 cursor-pointer">
+        </NavLink>
+        <NavLink  to='/stared' className={({ isActive }) => `text-white inline-flex items-center px-2 py-1 hover:bg-white/25 w-full rounded cursor-pointer ${isActive ? 'bg-white/25' : ''}`} >
           <FaRegStar className="w-5 h-5" />
           <span className="ml-3 font-semibold">Started</span>
-        </Link>
-        <li className="text-white inline-flex items-center px-2 py-1 w-full rounded hover:bg-white/25 cursor-pointer">
+        </NavLink>
+        <NavLink to='/important' className={({ isActive }) => `text-white inline-flex items-center px-2 py-1 hover:bg-white/25 w-full rounded cursor-pointer ${isActive ? 'bg-white/25' : ''}`}>
           <FaRegBell className="w-5 h-5" />
           <span className="ml-3 font-semibold">Important</span>
-        </li>
+        </NavLink>
 
-        <li className="text-white inline-flex items-center px-2 py-1 w-full rounded hover:bg-white/25 cursor-pointer">
+        <NavLink to='/sent' className={({ isActive }) => `text-white inline-flex items-center px-2 py-1 hover:bg-white/25 w-full rounded cursor-pointer ${isActive ? 'bg-white/25' : ''}`}>
           <FaRegPaperPlane className="w-5 h-5" />
           <span className="ml-3 font-semibold">Sent</span>
-        </li>
+        </NavLink>
       </ul>
     </nav>
   );
