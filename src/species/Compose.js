@@ -7,70 +7,63 @@ import {
 } from "react-icons/fa";
 import classNames from "classnames/bind";
 import { db } from "../firebase/config";
-import { addDoc, collection, doc,  getDocs, query, Timestamp, updateDoc, where } from "firebase/firestore";
+import { collection, doc } from "firebase/firestore";
 import { useAppcontext } from "../context/AppProvider";
-import { isComposeValid } from "../helper/validation";
+import { useFirestore } from "../hook/useFirestore";
+import EmailFiled from "./EmailFiled";
 
 const Compose = () => {
   const [expand, setExpand] = useState(false);
-  const [form, setForm] = useState({ to: '', subject: '', message: '' });
+  const [form, setForm] = useState({ to: {}, subject: '', message: '' });
+  const [valid, setValid] = useState(false);
 
 
-  const [error, setError] = useState({});
 
-  const { state: { compose, details: { messages, subject, id }, list }, dispatch } = useAppcontext()
+
+  const { state: { compose, details: { messages, subject, id }, user }, dispatch } = useAppcontext()
 
 
   useEffect(() => {
+    compose === 2 && setForm(f => ({ ...f, subject: subject }))
 
-    compose === 2 && setForm({ ...form, to: messages[0].from.did, subject: subject })
+    compose === 3 && setForm(f => ({ ...f, message: messages.map(m => m.message).join('\n \n'), subject: subject }))
 
-    compose === 3 && setForm({ ...form, message: messages.map(m => m.message).join('\n \n'), subject: subject })
-
-  }, [compose]);
+  }, [compose, messages, subject]);
 
 
+
+  useEffect(() => {
+    let isValid = true
+
+    if (
+      (form.subject === '' || form.message === '') ||
+      (JSON.stringify(form.to) === '{}' || compose === 2)
+    ) {
+
+      isValid = false
+    }
+
+    setValid(isValid)
+  }, [form, compose]);
+
+
+  const { add, update } = useFirestore()
 
   const handleSumit = async () => {
-
-    if (!isComposeValid(form)) return setError()
-
-    // return console.log(id);
-
-        let to = {}
-        const docRef = query(collection(db, "users"), where("email_id", "==", form.to));
-        const getToMail = await getDocs(docRef);
-
-        getToMail.forEach((doc) => {
-          // doc.data() is never undefined for query doc snapshots
-          to = { ...doc.data(), id: doc.id, }
-        });
-
-        if (JSON.stringify(to) === '{}') {
-          return setError({ ...error, to: 'Email address not found!' })
-        }
-
-
-    // return to ? console.log(to) : console.log('notfound');
-
-    // return console.log(form)
-    const time = Timestamp.fromDate(new Date())
-
     let emailId = null
 
     if (compose !== 2) {
 
       const refEmail = collection(db, "email");
-      const addedDoc = await addDoc(refEmail, {
+      const addedDoc = await add(refEmail, {
         subject: form.subject,
-        from: 'vqvh1UYh5Fq3czazmmLx',
-        from_name: 'Nikhil Limbad',
-        to: to.id,
-        to_name: to.name,
+        from: user.id,
+        from_name: user.name,
+        to: form.to.id,
+        to_name: form.to.name,
         type: [0, 1],
         message: form.message.substring(0, 120),
-        createdAt: time
-      });
+      })
 
       emailId = addedDoc.id
 
@@ -80,23 +73,21 @@ const Compose = () => {
 
       const docRef = doc(db, "email", id);
 
-      await updateDoc(docRef, {
-        flow:0,
-        createdAt: time
-      });
+      await update(docRef, {
+        flow: 0, // It suggets that email is made upon a reply!
+      })
 
       emailId = id
     }
 
     const refMessage = collection(db, "email", emailId, 'message');
 
-    await addDoc(refMessage, {
+    await add(refMessage, {
       message: form.message,
       from: {
-        name: 'Nikhil Limbad',
-        did: 'nikhil@dmail',
+        name: user.name,
+        did: user.email_id,
       },
-      createdAt: time
     })
 
 
@@ -114,6 +105,7 @@ const Compose = () => {
         "w-screen",
         "fixed",
         "flex",
+        'z-30',
         { "items-center": expand },
         { "justify-center": expand },
         { "items-end": !expand },
@@ -156,13 +148,10 @@ const Compose = () => {
           />
         </div>
         <div className="flex flex-col m-5 space-y-4 h-full">
-          <input
-            type="text"
-            className="bg-black/25 px-2 py-1 outline-none placeholder-black/75 font-semibold rounded focus:bg-white focus:border-sky-500 border-2"
-            placeholder="To"
-            value={form.to}
-            onInput={e => setForm({ ...form, to: e.target.value })}
-          />
+
+          {compose !== 2 && <EmailFiled form={form} setForm={setForm} />}
+
+
           <input
             type="text"
             className="bg-black/25 px-2 py-1 outline-none placeholder-black/75 font-semibold rounded focus:bg-white focus:border-sky-500 border-2"
@@ -179,7 +168,7 @@ const Compose = () => {
           />
 
           <div className="flex justify-between">
-            <button className="bg-sky-500 p-1 rounded px-5 text-white font-semibold" onClick={handleSumit}>
+            <button className={`bg-sky-500 p-1 rounded px-5 text-white font-semibold ${valid ? 'bg-sky-500' : 'bg-stone-500'}`} onClick={handleSumit} disabled={!valid}>
               Send
             </button>
             <div className="w-8 h-8 border border-sky-500 rounded flex items-center justify-center">
@@ -188,7 +177,7 @@ const Compose = () => {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 
