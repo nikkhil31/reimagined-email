@@ -18,7 +18,7 @@ import Nav from "./Nav";
 import { useRealtime } from "../hook/useRealtime";
 import { useFirestore } from "../hook/useFirestore";
 
-const List = ({page}) => {
+const List = ({ page }) => {
 
 
   const [checked, setChecked] = useState([]);
@@ -37,17 +37,17 @@ const List = ({page}) => {
   const pageFilter = (doc) => {
     switch (page) {
       case 0:
-        return doc.to === user.id 
+        return doc.to === user.id
       case 1:
         return doc.type.includes(0) && doc.to === user.id
       case 2:
         return doc.type.includes(1) && doc.to === user.id
       case 3:
-          return doc.from === user.id 
+        return doc.from === user.id
       default:
         return 1 === 1
     }
-    
+
   }
 
   const goToMassage = (id, subject) => {
@@ -59,12 +59,14 @@ const List = ({page}) => {
 
   const { update } = useFirestore()
 
-  const handleStar = async (id, typeArr) => {
-    console.log(id, typeArr);
+  const handleStar = async (id, convey, bool) => {
+    console.log(id, convey);
     const docRef = doc(db, "email", id);
 
+    let arr = convey.map(con => con.id === user.id ? { ...con, type: bool } : con)
+
     await update(docRef, {
-      type: typeArr,
+      convey: arr,
     })
   }
 
@@ -137,8 +139,8 @@ const List = ({page}) => {
                     : (<FaRegStar className="text-sky-500" onClick={e => setStar(s => ([...s, email.id]))} />)
                 } */}
                 {
-                  email.type.includes(0) ? (<FaStar className="text-sky-500" onClick={e => handleStar(email.id, email.type.filter(mail => mail !== 0))} />)
-                    : (<FaRegStar className="text-sky-500" onClick={e => handleStar(email.id, [...email.type, 0])} />)
+                  email.convey.find(con => con.id === user.id)?.type.includes(0) ? (<FaStar className="text-sky-500" onClick={e => handleStar(email.id, email.convey, email.convey.find(con => con.id === user.id)?.type.filter(p => p !== 0))} />)
+                    : (<FaRegStar className="text-sky-500" onClick={e => handleStar(email.id, email.convey, email.convey.find(con => con.id === user.id)?.type.push(0))} />)
                 }
                 <div className="w-5 h-5"></div>
                 <h3 className="w-40 font-bold" onClick={() => goToMassage(email.id, email.subject)}>{email.from_name}</h3>
